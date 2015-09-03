@@ -15,4 +15,22 @@ public class Cost {
 		return Global.Monney > TowerProduction(); 
 	}
 
+	public static int TowerUpgrade(Tower.eUpgrade type, int lv){
+		float cost = 0;
+			switch(type){
+			case Tower.eUpgrade.Range:
+				cost = 10 * Mathf.Pow(1.5f,(lv -1));
+				break;
+
+			case Tower.eUpgrade.Firerate:
+				cost = 15 * Mathf.Pow(1.5f,(lv -1));
+				break;
+			case Tower.eUpgrade.Power:
+				cost = 20 * Mathf.Pow(1.5f,(lv -1));
+				break;
+		}
+
+		return (int)cost;
+	}
+
 }

@@ -31,6 +31,8 @@ public class GameMgr : MonoBehaviour {
 	const float TIMER_WAIT = 2.0f;
 	float _tWait = TIMER_WAIT;
 
+	CursorRange _cursorRange;
+
 	// Use this for initialization
 	void Start () {
 
@@ -41,6 +43,8 @@ public class GameMgr : MonoBehaviour {
 		Particle.parent = new TokenMgr<Particle>("Particle",256);
 
 		Tower.parent = new TokenMgr<Tower>("Tower",64);
+
+
 
 		GameObject prefab = null;
 		prefab = Util.GetPrefab(prefab,"Field");
@@ -59,6 +63,9 @@ public class GameMgr : MonoBehaviour {
 		_enemyGenerator = new EnemyGenerator(_path);
 
 		_waveStart = MyCanvas.Find<WaveStart>("TextWaveStart");
+
+		_cursorRange = GameObject.Find("CursorRange").GetComponent<CursorRange>();
+		_cursorRange.SetVisible(false,0);
 
 
 	}
@@ -172,22 +179,55 @@ public class GameMgr : MonoBehaviour {
 
 	void ChangeSelMode(eSelmode mode){
 		switch(mode){
-		case eSelmode.None:
-			MyCanvas.SetActive("ButtonBuy",true);
-			MyCanvas.SetActive("TextTowerInfo",false);
-			break;
-		case eSelmode.Buy:
-			MyCanvas.SetActive("ButtonBuy",false);
-			MyCanvas.SetActive("TextTowerInfo",false);
-			break;
-		case eSelmode.Upgrade:
-			MyCanvas.SetActive("ButtonBuy",true);
-			MyCanvas.SetActive("TextTowerInfo",true);
+			case eSelmode.None:
+				MyCanvas.SetActive("ButtonBuy",true);
+				MyCanvas.SetActive("TextTowerInfo",false);
+				_cursorRange.SetVisible(false,0);
+				SetActiveUpgrade(false);
+				break;
+			case eSelmode.Buy:
+				MyCanvas.SetActive("ButtonBuy",false);
+				MyCanvas.SetActive("TextTowerInfo",false);
+				_cursorRange.SetVisible(false,0);
+				SetActiveUpgrade(false);
+				break;
+			case eSelmode.Upgrade:
+				MyCanvas.SetActive("ButtonBuy",true);
+				MyCanvas.SetActive("TextTowerInfo",true);
+				_cursorRange.SetVisible(true,_selTower.LvRange);
+				_cursorRange.SetPosition(_cursor);
+				SetActiveUpgrade(true);
+				break;
 		}
 		_selMode = mode;
 	}
 
 	bool IsWaveClear(){
 		return _enemyGenerator.Number <= 0 && Enemy.parent.Count() <= 0;
+	}
+
+	void SetActiveUpgrade(bool b){
+		MyCanvas.SetActive("ButtonRange",b);
+		MyCanvas.SetActive("ButtonFirerate",b);
+		MyCanvas.SetActive("ButtonPower",b);
+	}
+
+	void ExecUpgrade(Tower.eUpgrade type){
+
+		int	cost = _selTower.GetCost(type);
+		Global.UseMoney(cost);
+
+		_selTower.Upgrade(type);
+		_cursorRange.SetVisible(true,_selTower.LvRange);
+	}
+
+	public void OnClickRange(){
+		ExecUpgrade(Tower.eUpgrade.Range);
+	}
+	public void OnClickFirerate(){
+		ExecUpgrade(Tower.eUpgrade.Firerate);
+	}
+	public void OnClickPower(){
+		ExecUpgrade(Tower.eUpgrade.Power);
 	}
 }

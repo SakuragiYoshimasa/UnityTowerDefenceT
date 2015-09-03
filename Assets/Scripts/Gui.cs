@@ -9,6 +9,9 @@ public class Gui  {
 	TextObj _txtWave;
 	TextObj _txtTowerInfo;
 
+	ButtonObj _btnRange;
+	ButtonObj _btnFirerate;
+	ButtonObj _btnPower;
 
 	public Gui(){
 		_txtMoney = MyCanvas.Find<TextObj>("TextMoney");
@@ -17,6 +20,10 @@ public class Gui  {
 		_txtCost.Label = "";
 		_txtWave = MyCanvas.Find<TextObj>("TextWave");
 		_txtTowerInfo = MyCanvas.Find<TextObj>("TextTowerInfo");
+
+		_btnRange = MyCanvas.Find<ButtonObj>("ButtonRange");
+		_btnFirerate = MyCanvas.Find<ButtonObj>("ButtonFirerate");
+		_btnPower = MyCanvas.Find<ButtonObj>("ButtonPower");
 
 	}
 
@@ -46,5 +53,17 @@ public class Gui  {
 				tower.LvRange,tower.LvFirerate,tower.LvPower);
 		}
 
+		if(tower == null){
+			return;
+		}
+
+		_btnRange.Enabled = Global.Monney >= tower.CostRange;
+		_btnRange.FormatLabel("Range (${0})",tower.CostRange);
+		
+		_btnFirerate.Enabled = Global.Monney >= tower.CostFirerate;
+		_btnFirerate.FormatLabel("Firerate (${0})",tower.CostFirerate);
+		
+		_btnPower.Enabled = Global.Monney >= tower.CostPower;
+		_btnPower.FormatLabel("Power (${0})",tower.CostPower);
 	}
 }

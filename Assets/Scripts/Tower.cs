@@ -3,6 +3,12 @@ using System.Collections;
 
 public class Tower : Token {
 
+	public enum eUpgrade{
+		Range,
+		Firerate,
+		Power
+	}
+
 	public static TokenMgr<Tower> parent;
 
 	public static Tower Add(float px,float py){
@@ -47,6 +53,33 @@ public class Tower : Token {
 		}
 	}
 
+	public int CostRange{
+		get{
+			return Cost.TowerUpgrade(eUpgrade.Range,_lvRange);
+		}
+	}
+
+	
+	public int CostFirerate{
+		get{
+			return Cost.TowerUpgrade(eUpgrade.Firerate,_lvFirerate);
+		}
+	}
+	
+	public int CostPower{
+		get{
+			return Cost.TowerUpgrade(eUpgrade.Power,_lvPower);
+		}
+	}
+
+	public int GetCost(eUpgrade type){
+		switch(type){
+			case eUpgrade.Range:return CostRange;
+			case eUpgrade.Firerate:return CostFirerate;
+			case eUpgrade.Power:return CostPower;
+		}
+		return 0;
+	}
 	// Use this for initialization
 	//void Start () {
 	void Init(){
@@ -104,6 +137,41 @@ public class Tower : Token {
 		_range = TowerParam.Range(_lvRange);
 		_power = TowerParam.Power(_lvPower);
 		_tFirerate = TowerParam.Firerate(_lvFirerate);
+
+		float avg = (_lvRange + _lvFirerate + _lvPower) / 3.0f;
+		int avgLv = Mathf.CeilToInt(avg);
+
+		Color c;
+		switch(avgLv){
+			case 1:c = Color.white; break; 
+			case 2:c = Color.cyan; break;
+			case 3:c = Color.green; break;
+			case 4:c = Color.yellow; break;
+			default:c = Color.red; break;
+		}
+
+	}
+
+	public void Upgrade(eUpgrade type){
+		switch(type){
+
+			case eUpgrade.Range:
+				_lvRange++;
+				break;
+			case eUpgrade.Firerate:
+				_lvFirerate++;
+				break;
+			case eUpgrade.Power:
+				_lvPower++;
+				break;
+
+		}
+
+		UpdateParam();
+		Particle p = Particle.Add(Particle.eType.Ellipse,20,X,Y,0,0);
+		if(p){
+			p.SetColor(0.2f,0.2f,1f);
+		}
 
 	}
 
